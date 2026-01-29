@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:goal_play/Utils/Constants/Constants.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
