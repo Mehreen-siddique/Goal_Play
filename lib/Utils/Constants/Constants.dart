@@ -304,3 +304,52 @@ class AppSizes {
   static const double buttonHeight = 50.0;
   static const double buttonHeightSM = 40.0;
 }
+
+
+// APP SHADOWS
+
+
+class AppShadows {
+  static List<BoxShadow> cardShadow = [
+    BoxShadow(
+      color: AppColors.shadowDark,
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+      spreadRadius: 0,
+    ),
+  ];
+
+  static List<BoxShadow> cardShadowLarge = [
+    BoxShadow(
+      color: AppColors.shadowDark,
+      blurRadius: 20,
+      offset: const Offset(0, 8),
+      spreadRadius: 0,
+    ),
+  ];
+
+  static List<BoxShadow> glowPurple = [
+    BoxShadow(
+      color: AppColors.shadowPurple,
+      blurRadius: 20,
+      spreadRadius: 2,
+    ),
+  ];
+
+  static List<BoxShadow> glowGold = [
+    BoxShadow(
+      color: AppColors.shadowGold,
+      blurRadius: 15,
+      spreadRadius: 1,
+    ),
+  ];
+
+  static List<BoxShadow> buttonShadow = [
+    BoxShadow(
+      color: AppColors.primaryPurple.withOpacity(0.3),
+      blurRadius: 12,
+      offset: const Offset(0, 6),
+    ),
+  ];
+}
+
