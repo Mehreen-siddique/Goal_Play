@@ -353,3 +353,59 @@ class AppShadows {
   ];
 }
 
+// GRADIENT HELPERS
+
+
+class AppGradients {
+  static LinearGradient primaryPurple = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: AppColors.gradientPrimaryPurple,
+  );
+  static LinearGradient secondaryPurple = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: AppColors.gradientPrimary,
+  );
+
+  static LinearGradient feed = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: AppColors.gradientEasy,
+  );
+
+  static LinearGradient play = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: AppColors.gradientMedium,
+  );
+
+  static LinearGradient train = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: AppColors.gradientMedium,
+  );
+
+  static RadialGradient arBackground = const RadialGradient(
+    center: Alignment.center,
+    radius: 1.0,
+    colors: AppColors.gradientARBackground,
+  );
+
+  static LinearGradient getQuestGradient(String type) {
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: AppColors.getQuestGradient(type),
+    );
+  }
+}
+
+
+// ANIMATION DURATIONS
+
+class AppDurations {
+  static const Duration fast = Duration(milliseconds: 200);
+  static const Duration normal = Duration(milliseconds: 300);
+  static const Duration slow = Duration(milliseconds: 500);
+}
