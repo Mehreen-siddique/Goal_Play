@@ -264,3 +264,43 @@ class AppTextStyles {
 }
 
 
+
+// APP SIZES
+class AppSizes {
+  // Padding
+  static const double paddingXS = 4.0;
+  static const double paddingSM = 8.0;
+  static const double padding = 16.0;
+  static const double paddingMD = 20.0;
+  static const double paddingLG = 24.0;
+  static const double paddingXL = 32.0;
+
+  // Border radius
+  static const double radiusXS = 8.0;
+  static const double radiusSM = 12.0;
+  static const double radius = 16.0;
+  static const double radiusMD = 20.0;
+  static const double radiusLG = 24.0;
+  static const double radiusXL = 30.0;
+
+  // Icon sizes
+  static const double iconXS = 16.0;
+  static const double iconSM = 20.0;
+  static const double icon = 24.0;
+  static const double iconMD = 28.0;
+  static const double iconLG = 32.0;
+  static const double iconXL = 40.0;
+
+  // Card dimensions
+  static const double cardHeight = 120.0;
+  static const double cardElevation = 4.0;
+
+  // Avatar sizes
+  static const double avatarSM = 40.0;
+  static const double avatar = 60.0;
+  static const double avatarLG = 80.0;
+
+  // Button heights
+  static const double buttonHeight = 50.0;
+  static const double buttonHeightSM = 40.0;
+}
