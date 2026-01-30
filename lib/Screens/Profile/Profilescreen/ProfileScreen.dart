@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/Profile/AchievementScreen/AchievementScreen.dart';
 import 'package:goal_play/Screens/Profile/editProfile/EditProfile.dart';
+import 'package:goal_play/Screens/Settings/SettingScreen/SettingScreen.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 
