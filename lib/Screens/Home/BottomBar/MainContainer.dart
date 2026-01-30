@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/ARCharacter/ARScreen.dart';
 import 'package:goal_play/Screens/Home/home/HomeScreen.dart';
+import 'package:goal_play/Screens/Leaderboard/LeaderBoardScreen/LeaderboardScreen.dart';
 import 'package:goal_play/Screens/Profile/Profilescreen/ProfileScreen.dart';
 import 'package:goal_play/Screens/Quest/QuestList/QuestList.dart';
+import 'package:goal_play/Screens/Widgets/BottomBar/BottomBar.dart';
 
 
 

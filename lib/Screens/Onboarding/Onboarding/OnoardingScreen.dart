@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:goal_play/Screens/Authentication/Login/Login.dart';
 import 'package:goal_play/Screens/Onboarding/OnboardingClass/Onboardingclass.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
-
 
 
 class onboarding1 extends StatefulWidget {
@@ -114,17 +114,17 @@ class _onboarding1State extends State<onboarding1> {
     );
   }
 
-  // void _skipToLogin() {
-  //   Navigator.of(context).pushReplacement(
-  //     MaterialPageRoute(builder: (context)=>LoginScreen()),
-  //   );
-  // }
-  //
-  // void _navigateToLogin() {
-  //   Navigator.of(context).pushReplacement(
-  //     MaterialPageRoute(builder: (context) => LoginScreen()),
-  //   );
-  // }
+  void _skipToLogin() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context)=>LoginScreen()),
+    );
+  }
+
+  void _navigateToLogin() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
 
 
   @override
@@ -140,8 +140,7 @@ class _onboarding1State extends State<onboarding1> {
                   children: [
                     // skip button
                     TextButton(
-                      onPressed: () {},
-                      // onPressed:_skipToLogin,
+                      onPressed:_skipToLogin,
                       child: Text(
                         'Skip',
                         style: AppTextStyles.body.copyWith(
@@ -191,10 +190,9 @@ class _onboarding1State extends State<onboarding1> {
                     width: double.infinity,
                     height: AppSizes.buttonHeight,
                     child: ElevatedButton(
-                      onPressed: (){},
-                      // onPressed: _currentPage == _pages.length - 1
-                      //     ? _navigateToLogin
-                      //     : _nextPage,
+                      onPressed: _currentPage == _pages.length - 1
+                          ? _navigateToLogin
+                          : _nextPage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryPurple,
                         shape: RoundedRectangleBorder(

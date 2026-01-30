@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "480773029928",
+    "project_id": "goal-play",
+    "storage_bucket": "goal-play.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480773029928:android:9d726b88dc7fb80a1e351d",
+        "android_client_info": {
+          "package_name": "com.example.goal_play"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBboBdcXt9hthYVgncRtN8VG9S_ZXimVeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
