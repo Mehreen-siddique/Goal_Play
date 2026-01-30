@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goal_play/Utils/Constants/Constants.dart';
+import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 
 class XPProgressBar  extends StatelessWidget {
 
