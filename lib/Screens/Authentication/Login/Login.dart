@@ -1,6 +1,9 @@
 // screens/auth/login_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:goal_play/Screens/Authentication/ForgotPassword/ForgotPassword.dart';
+import 'package:goal_play/Screens/Authentication/Signup/Signup.dart';
+import 'package:goal_play/Screens/Home/BottomBar/MainContainer.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 
 

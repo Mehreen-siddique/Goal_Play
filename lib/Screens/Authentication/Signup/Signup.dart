@@ -1,6 +1,8 @@
 // screens/auth/SignUp_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:goal_play/Screens/Authentication/Login/Login.dart';
+import 'package:goal_play/Screens/Home/BottomBar/MainContainer.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 
 
@@ -59,31 +61,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: AppTextStyles.heading.copyWith(fontSize: 32),
                     ),
                   ),
-                  // const SizedBox(height: 8),
-                  // Text(
-                  //   'Login to continue your journey',
-                  //   style: AppTextStyles.body.copyWith(fontSize: 16),
-                  // ),
-                  const SizedBox(height: 60),
 
-                  // // Logo
-                  // Center(
-                  //   child: Container(
-                  //     width: 100,
-                  //     height: 100,
-                  //     decoration: BoxDecoration(
-                  //       gradient: AppGradients.primaryPurple,
-                  //       borderRadius: BorderRadius.circular(25),
-                  //       boxShadow: AppShadows.glowPurple,
-                  //     ),
-                  //     child: const Icon(
-                  //       Icons.emoji_events_rounded,
-                  //       size: 60,
-                  //       color: AppColors.textWhite,
-                  //     ),
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 60),
+                  const SizedBox(height: 60),
 
                   // Email Field
                   Text(
