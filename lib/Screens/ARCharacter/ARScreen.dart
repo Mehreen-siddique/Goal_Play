@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 
@@ -52,9 +51,9 @@ class ARCharacterScreen extends StatefulWidget {
 }
 
 class _ARCharacterScreenState extends State<ARCharacterScreen> {
-  final _picker = ImagePicker();
-
-  File? _pickedImage;
+  // Removed image picker functionality
+  late ARCharacterItem _selected;
+  CharacterAnimMode _animMode = CharacterAnimMode.idle;
 
   /// Dummy data
   final List<ARCharacterItem> _characters = const [
@@ -66,7 +65,7 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
       idleModel: 'assets/images/2idle.glb',
       actionModel: 'assets/models/1Dancing.glb',
       actionLabel: 'fightingpose',
-      thumbnail: '🧙',
+      thumbnail: 'assets/images/warrior_thumb.jpg',
       gradient: AppColors.gradientHard,
     ),
     ARCharacterItem(
@@ -77,7 +76,7 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
       idleModel: 'assets/images/4idle.glb',
       actionModel: 'assets/models/3HipHop.glb',
       actionLabel: 'Dancing',
-      thumbnail: '🔥',
+      thumbnail: 'assets/images/scholar_thumb.jpg',
       gradient: AppColors.gradientMedium,
     ),
     ARCharacterItem(
@@ -88,13 +87,10 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
       idleModel: 'assets/images/3idle.glb',
       actionModel: 'assets/models/3Excited.glb',
       actionLabel: 'Excited',
-      thumbnail: '🏹',
+      thumbnail: 'assets/images/explorer_thumb.jpg',
       gradient: AppColors.gradientEasy,
     ),
   ];
-
-  late ARCharacterItem _selected;
-  CharacterAnimMode _animMode = CharacterAnimMode.idle;
 
   @override
   void initState() {
@@ -157,18 +153,7 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
               style: AppTextStyles.screenHeading.copyWith(fontSize: 20),
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppGradients.primaryPurple,
-              borderRadius: BorderRadius.circular(AppSizes.radiusSM),
-              boxShadow: AppShadows.glowPurple,
-            ),
-            child: IconButton(
-              tooltip: 'Camera/Gallery',
-              icon: Icon(Icons.camera_alt, color: AppColors.textWhite),
-              onPressed: _showImageSourceDialog,
-            ),
-          ),
+          // Removed camera icon for cleaner interface
         ],
       ),
     );
@@ -429,38 +414,91 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // character picture
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: Image.asset(
-                      c.thumbnail,
-                      width: 46,
-                      height: 46,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
-                        // fallback if image missing
-                        return Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: AppColors.statsBackground,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(c.Icon, color: AppColors.primaryPurple),
-                        );
-                      },
+                  // Enhanced character picture with border and shadow
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? c.gradient.first.withOpacity(0.5) : Colors.transparent,
+                        width: isSelected ? 3 : 2,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                            BoxShadow(
+                              color: c.gradient.first.withOpacity(0.4),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                          : [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: Image.asset(
+                        c.thumbnail,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          // Enhanced fallback with gradient background
+                          return Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primaryPurple.withOpacity(0.8),
+                                  AppColors.accentMagenta.withOpacity(0.8),
+                                ],
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              c.Icon,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    c.characterClass,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: isSelected ? AppColors.textWhite : AppColors.textDark,
+                  // Enhanced character name with better styling
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isSelected ? c.gradient.first.withOpacity(0.15) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      c.characterClass,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: isSelected ? AppColors.textWhite : AppColors.textDark,
+                        shadows: isSelected
+                            ? [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ]
+                            : null,
+                      ),
                     ),
                   ),
                   if (isSelected) ...[
@@ -475,130 +513,9 @@ class _ARCharacterScreenState extends State<ARCharacterScreen> {
       ),
     );
   }
-
-
-
-  //  Camera/Gallery
-
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.whiteBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLG)),
-      ),
-      builder: (_) => Padding(
-        padding: EdgeInsets.all(AppSizes.paddingLG),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.textGray.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text('Choose Image', style: AppTextStyles.subheading),
-            const SizedBox(height: 18),
-
-            ListTile(
-              leading: Container(
-                padding: EdgeInsets.all(AppSizes.paddingSM),
-                decoration: BoxDecoration(
-                  gradient: AppGradients.primaryPurple,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSM),
-                ),
-                child: Icon(Icons.camera_alt, color: AppColors.textWhite),
-              ),
-              title: Text('Take Photo', style: AppTextStyles.bodyDark),
-              subtitle: Text('Camera se new image', style: AppTextStyles.caption),
-              onTap: () async {
-                Navigator.pop(context);
-                await _pickImage(ImageSource.camera);
-              },
-            ),
-
-            ListTile(
-              leading: Container(
-                padding: EdgeInsets.all(AppSizes.paddingSM),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: _selected.gradient),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSM),
-                ),
-                child: Icon(Icons.photo_library, color: AppColors.textWhite),
-              ),
-              title: Text('Choose from Gallery', style: AppTextStyles.bodyDark),
-              subtitle: Text('Gallery se select karein', style: AppTextStyles.caption),
-              onTap: () async {
-                Navigator.pop(context);
-                await _pickImage(ImageSource.gallery);
-              },
-            ),
-
-            if (_pickedImage != null)
-              ListTile(
-                leading: Container(
-                  padding: EdgeInsets.all(AppSizes.paddingSM),
-                  decoration: BoxDecoration(
-                    color: AppColors.errorRed.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(AppSizes.radiusSM),
-                  ),
-                  child: Icon(Icons.delete, color: AppColors.errorRed),
-                ),
-                title: Text('Remove Selected Image',
-                    style: AppTextStyles.bodyDark.copyWith(color: AppColors.errorRed)),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() => _pickedImage = null);
-                },
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        setState(() => _pickedImage = File(image.path));
-
-        // Backend ready: later you can upload this file to Firebase Storage
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Image selected (backend upload ready).'),
-            backgroundColor: AppColors.accentGreen,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Image pick error: $e'),
-          backgroundColor: AppColors.errorRed,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
 }
 
-
-
-
-
-
+// Removed image picker functionality for cleaner interface
 
 
 
