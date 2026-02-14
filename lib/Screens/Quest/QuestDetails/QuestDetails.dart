@@ -254,75 +254,200 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
         child: Container(
-          padding: const EdgeInsets.all(24),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppColors.whiteBackground,
-            borderRadius: BorderRadius.circular(25),
-            boxShadow: AppShadows.cardShadowLarge,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primaryPurple.withOpacity(0.95),
+                AppColors.accentMagenta.withOpacity(0.95),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: AppColors.highlightGold.withOpacity(0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryPurple.withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 5,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Success Animation Container
               Container(
-                width: 80,
-                height: 80,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: AppColors.gradientHard,
                   ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.highlightGold.withOpacity(0.4),
+                      blurRadius: 15,
+                      spreadRadius: 3,
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                  size: 50,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer ring animation
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    // Center icon
+                    const Icon(
+                      Icons.emoji_events,
+                      color: Colors.white,
+                      size: 45,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Quest Completed!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _quest.title,
-                style: AppTextStyles.body.copyWith(fontSize: 16),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              // Rewards
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildRewardItem(
-                    icon: Icons.stars,
-                    value: '+${_quest.xpReward}',
-                    label: 'XP',
-                    color: AppColors.highlightGold,
+              // Title with gradient effect
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.highlightGold,
+                      AppColors.leaderboardGold,
+                    ],
                   ),
-                  _buildRewardItem(
-                    icon: Icons.favorite,
-                    value: '+${_quest.statBonus}',
-                    label: 'Health',
-                    color: AppColors.accentGreen,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Quest Completed!',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  _buildRewardItem(
-                    icon: Icons.monetization_on,
-                    value: '+${_quest.goldReward}',
-                    label: 'Gold',
-                    color: AppColors.highlightGold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Quest title
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
                   ),
-                ],
+                ),
+                child: Text(
+                  _quest.title,
+                  style: AppTextStyles.subheading.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const SizedBox(height: 24),
-              SizedBox(
+              // Rewards Section
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.highlightGold.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Rewards Earned',
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.highlightGold,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildRewardItem(
+                          icon: Icons.stars,
+                          value: '+${_quest.xpReward}',
+                          label: 'XP',
+                          color: AppColors.highlightGold,
+                        ),
+                        _buildRewardItem(
+                          icon: Icons.favorite,
+                          value: '+${_quest.statBonus}',
+                          label: 'Health',
+                          color: AppColors.accentGreen,
+                        ),
+                        _buildRewardItem(
+                          icon: Icons.monetization_on,
+                          value: '+${_quest.goldReward}',
+                          label: 'Gold',
+                          color: AppColors.highlightGold,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Awesome Button
+              Container(
                 width: double.infinity,
                 height: AppSizes.buttonHeight,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.highlightGold,
+                      AppColors.leaderboardGold,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.highlightGold.withOpacity(0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: () async {
                     Navigator.pop(context);
@@ -355,8 +480,18 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Quest completed! Rewards added.'),
-                            backgroundColor: Colors.green,
+                            content: Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                const Text('Quest completed! Rewards added.'),
+                              ],
+                            ),
+                            backgroundColor: AppColors.accentGreen,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         );
                         Navigator.pop(context, true);
@@ -365,25 +500,41 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Error completing quest: $e'),
-                            backgroundColor: Colors.red,
+                            content: Row(
+                              children: [
+                                Icon(Icons.error, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                Text('Error completing quest: $e'),
+                              ],
+                            ),
+                            backgroundColor: AppColors.errorRed,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         );
                       }
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryPurple,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusSM),
-                    ),
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.zero,
                   ),
                   child: const Text(
                     'Awesome!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                   ),
                 ),
