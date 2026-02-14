@@ -473,43 +473,25 @@ class _QuestListScreenState extends State<QuestListScreen>
 
 
     return ListView.builder(
-
       padding: const EdgeInsets.all(16),
-
-      itemCount: _getSelectedQuests().length,
-
+      itemCount: quests.length,
       itemBuilder: (context, index) {
-
-        final quest = _getSelectedQuests()[index];
-
+        final quest = quests[index];
+        
         return QuestCard(
-
           quest: quest,
-
           onTap: () async {
-
             final result = await Navigator.push(
-
               context,
-
               MaterialPageRoute(
-
                 builder: (context) => QuestDetailScreen(quest: quest),
-
               ),
-
             );
-
-
-
+            
             if (result == true) {
-
               _dataService.refreshData();
-
             }
-
           },
-
         );
 
       },
