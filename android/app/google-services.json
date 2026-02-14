@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "480773029928",
+    "firebase_url": "https://goal-play-default-rtdb.firebaseio.com",
     "project_id": "goal-play",
     "storage_bucket": "goal-play.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.goal_play"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "480773029928-h20g7b83n2pp1qu8o36l59imqgjh0t79.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.goal_play",
+            "certificate_hash": "360c660a2f920d588da4c243bf794c7eeb39e8fd"
+          }
+        },
+        {
+          "client_id": "480773029928-0lirhrrhqleo9si1f36lf0n8hjibgug2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBboBdcXt9hthYVgncRtN8VG9S_ZXimVeg"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "480773029928-0lirhrrhqleo9si1f36lf0n8hjibgug2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "480773029928-mosftiv1rfbnsk6rknk2q997df9tb4aj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.goalPlay"
+              }
+            }
+          ]
         }
       }
     }

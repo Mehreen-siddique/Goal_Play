@@ -3,6 +3,10 @@ allprojects {
         google()
         mavenCentral()
     }
+//    dependencies {
+//        classpath("com.android.tools.build:gradle:8.10.2")
+//        classpath("com.google.gms:google-services:4.4.4")
+//    }
 }
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
@@ -19,3 +23,5 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+
