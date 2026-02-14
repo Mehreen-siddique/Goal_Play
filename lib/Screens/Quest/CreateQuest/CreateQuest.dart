@@ -24,6 +24,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
   QuestDifficulty _selectedDifficulty = QuestDifficulty.easy;
   TimeOfDay? _reminderTime;
   int? _duration;
+  String _durationUnit = 'minutes'; // 'minutes' or 'hours'
   bool _isDaily = false;
   bool _isCreating = false;
 
@@ -402,27 +403,81 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
           letterSpacing: 0.5,
         )),
         SizedBox(height: AppSizes.paddingSM),
-        TextFormField(
-          keyboardType: TextInputType.number,
-          style: AppTextStyles.bodyDark,
-          decoration: InputDecoration(
-            hintText: 'Duration in minutes (e.g., 30)',
-            hintStyle: AppTextStyles.body,
-            filled: true,
-            fillColor: AppColors.whiteBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radius),
-              borderSide: BorderSide.none,
+        Row(
+          children: [
+            // Duration input field
+            Expanded(
+              flex: 2,
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                style: AppTextStyles.bodyDark,
+                decoration: InputDecoration(
+                  hintText: 'Enter duration',
+                  hintStyle: AppTextStyles.body,
+                  filled: true,
+                  fillColor: AppColors.whiteBackground,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radius),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: Icon(Icons.timer, color: AppColors.primaryPurple),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _duration = int.tryParse(value);
+                  });
+                },
+              ),
             ),
-            prefixIcon: Icon(Icons.timer, color: AppColors.primaryPurple),
-            suffixText: 'min',
-            suffixStyle: AppTextStyles.body,
+            SizedBox(width: AppSizes.paddingSM),
+            // Unit selector
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingSM),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteBackground,
+                  borderRadius: BorderRadius.circular(AppSizes.radius),
+                  border: Border.all(
+                    color: AppColors.primaryPurple.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _durationUnit,
+                    isExpanded: true,
+                    icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryPurple),
+                    style: AppTextStyles.bodyDark,
+                    items: ['minutes', 'hours'].map((String unit) {
+                      return DropdownMenuItem<String>(
+                        value: unit,
+                        child: Text(
+                          unit,
+                          style: AppTextStyles.body,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _durationUnit = newValue!;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Helper text
+        SizedBox(height: AppSizes.paddingXS),
+        Text(
+          _durationUnit == 'minutes' 
+              ? 'Enter duration in minutes (e.g., 30, 45, 60)'
+              : 'Enter duration in hours (e.g., 1, 2, 3)',
+          style: AppTextStyles.caption.copyWith(
+            color: AppColors.textGray,
+            fontSize: 12,
           ),
-          onChanged: (value) {
-            setState(() {
-              _duration = int.tryParse(value);
-            });
-          },
         ),
       ],
     );
@@ -582,6 +637,12 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
       });
 
       try {
+        // Convert duration to minutes if needed
+        int? durationInMinutes = _duration;
+        if (_durationUnit == 'hours' && _duration != null) {
+          durationInMinutes = _duration! * 60;
+        }
+
         final newQuest = Quest(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           title: _titleController.text.trim(),
@@ -601,7 +662,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   _reminderTime!.minute,
                 )
               : null,
-          duration: _duration,
+          duration: durationInMinutes,
           icon: _getQuestTypeIcon(_selectedType),
           gradientColors: _getDifficultyGradient(_selectedDifficulty),
           isDaily: _isDaily,
