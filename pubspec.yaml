@@ -40,7 +40,9 @@ dependencies:
   model_viewer_plus: ^1.9.3
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4
-  google_sign_in: ^7.2.0
+  cloud_firestore: ^6.1.2
+  firebase_database: ^12.1.2
+  google_sign_in: ^6.2.0
   provider: ^6.1.5+1
 
 dev_dependencies:

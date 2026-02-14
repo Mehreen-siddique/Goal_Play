@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/Models/Quest/QuestClass.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
+import 'package:goal_play/Services/QuestServices/QuestServices.dart';
+import 'package:goal_play/Services/QuestServices/QuestServiceFirestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
@@ -15,12 +17,15 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final QuestService _questService = QuestService();
+  final QuestServiceFirestore _questServiceFirestore = QuestServiceFirestore();
 
   QuestType _selectedType = QuestType.health;
   QuestDifficulty _selectedDifficulty = QuestDifficulty.easy;
   TimeOfDay? _reminderTime;
   int? _duration;
   bool _isDaily = false;
+  bool _isCreating = false;
 
   @override
   void dispose() {
@@ -531,27 +536,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
       width: double.infinity,
       height: AppSizes.buttonHeight + 6,
       child: ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            final newQuest = Quest(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              title: _titleController.text,
-              description: _descriptionController.text,
-              type: _selectedType,
-              difficulty: _selectedDifficulty,
-              xpReward: _getXPReward(_selectedDifficulty),
-              statBonus: _getStatBonus(_selectedDifficulty),
-              goldReward: _getGoldReward(_selectedDifficulty),
-              isCompleted: false,
-              duration: _duration,
-              icon: _getQuestTypeIcon(_selectedType),
-              gradientColors: _getDifficultyGradient(_selectedDifficulty),
-              isDaily: _isDaily,
-              isCustom: true,
-            );
-            Navigator.pop(context, newQuest);
-          }
-        },
+        onPressed: _isCreating ? null : _createQuest,
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
@@ -566,10 +551,94 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
           ),
           child: Container(
             alignment: Alignment.center,
-            child: Text('Create Quest', style: AppTextStyles.button),
+            child: _isCreating
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text('Creating...', style: AppTextStyles.button),
+                    ],
+                  )
+                : Text('Create Quest', style: AppTextStyles.button),
           ),
         ),
       ),
     );
+  }
+
+  // Create quest method
+  Future<void> _createQuest() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isCreating = true;
+      });
+
+      try {
+        final newQuest = Quest(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          type: _selectedType,
+          difficulty: _selectedDifficulty,
+          xpReward: _getXPReward(_selectedDifficulty),
+          statBonus: _getStatBonus(_selectedDifficulty),
+          goldReward: _getGoldReward(_selectedDifficulty),
+          isCompleted: false,
+          dueDate: _reminderTime != null 
+              ? DateTime(
+                  DateTime.now().year,
+                  DateTime.now().month,
+                  DateTime.now().day,
+                  _reminderTime!.hour,
+                  _reminderTime!.minute,
+                )
+              : null,
+          duration: _duration,
+          icon: _getQuestTypeIcon(_selectedType),
+          gradientColors: _getDifficultyGradient(_selectedDifficulty),
+          isDaily: _isDaily,
+          isCustom: true,
+        );
+
+        // Save quest to Firestore (will generate 4-digit ID)
+        final questId = await _questServiceFirestore.createQuest(newQuest);
+        
+        // Update the quest object with the correct Firestore ID
+        final updatedQuest = newQuest.copyWith(id: questId);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Quest created successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context, true);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to create quest: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isCreating = false;
+          });
+        }
+      }
+    }
   }
 }

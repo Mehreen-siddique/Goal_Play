@@ -29,24 +29,6 @@ class UserModel {
     this.avatarUrl = '',
   });
 
-  // Dummy data for testing
-  factory UserModel.dummy() {
-    return UserModel(
-      id: '1',
-      name: 'Hero Knight',
-      level: 15,
-      currentXP: 2450,
-      xpForNextLevel: 3000,
-      health: 85,
-      maxHealth: 100,
-      strength: 60,
-      maxStrength: 100,
-      intelligence: 75,
-      maxIntelligence: 100,
-      goldCoins: 1250,
-    );
-  }
-
   // XP progress percentage
   double get xpProgress => currentXP / xpForNextLevel;
 
@@ -58,4 +40,37 @@ class UserModel {
 
   // Intelligence progress percentage
   double get intelligenceProgress => intelligence / maxIntelligence;
+  
+  // Copy with method for updating stats
+  UserModel copyWith({
+    String? id,
+    String? name,
+    int? level,
+    int? currentXP,
+    int? xpForNextLevel,
+    int? health,
+    int? maxHealth,
+    int? strength,
+    int? maxStrength,
+    int? intelligence,
+    int? maxIntelligence,
+    int? goldCoins,
+    String? avatarUrl,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      level: level ?? this.level,
+      currentXP: currentXP ?? this.currentXP,
+      xpForNextLevel: xpForNextLevel ?? this.xpForNextLevel,
+      health: health ?? this.health,
+      maxHealth: maxHealth ?? this.maxHealth,
+      strength: strength ?? this.strength,
+      maxStrength: maxStrength ?? this.maxStrength,
+      intelligence: intelligence ?? this.intelligence,
+      maxIntelligence: maxIntelligence ?? this.maxIntelligence,
+      goldCoins: goldCoins ?? this.goldCoins,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+    );
+  }
 }

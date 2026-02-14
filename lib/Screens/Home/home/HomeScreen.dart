@@ -7,6 +7,9 @@ import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 import 'package:goal_play/Screens/Widgets/ProgressBar/XpProgressBar.dart';
 import 'package:goal_play/Screens/Widgets/QuestCard/questCard.dart';
 import 'package:goal_play/Screens/Widgets/StatsBar/StatsBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:goal_play/Services/DataService/DataService.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -17,14 +20,33 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // DataService for cached data
+  final DataService _dataService = DataService();
+  
   late UserModel user;
   late List<Quest> quests;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    user = UserModel.dummy();
-    quests = Quest.getDailyQuests();
+    _loadDataFromService();
+  }
+
+  void _loadDataFromService() {
+    // Check if DataService is initialized
+    if (_dataService.isInitialized) {
+      setState(() {
+        user = _dataService.currentUser!;
+        quests = _dataService.todayQuests; // Use today's quests only
+        isLoading = false;
+      });
+    } else {
+      // Wait a moment and try again
+      Future.delayed(Duration(milliseconds: 500), () {
+        _loadDataFromService();
+      });
+    }
   }
 
   void _completeQuest(Quest quest) {
@@ -369,13 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   user.name,
                   style: AppTextStyles.heading.copyWith(fontSize: 20),
                 ),
-                Text(
-                    'Assalam Alaikum! 👋',
-                    style: AppTextStyles.body.copyWith(
-                        color: AppColors.primaryPurple
-                    )
-                ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
               ],
             ),
           ],
@@ -557,6 +573,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.lightBackground,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryPurple),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Loading Home...',
+                style: AppTextStyles.bodyDark,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     int completedQuests = quests
         .where((q) => q.isCompleted)
         .length;

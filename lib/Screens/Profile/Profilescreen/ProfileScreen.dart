@@ -1,9 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/Profile/AchievementScreen/AchievementScreen.dart';
 import 'package:goal_play/Screens/Profile/editProfile/EditProfile.dart';
 import 'package:goal_play/Screens/Settings/SettingScreen/SettingScreen.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
+import 'package:goal_play/Services/DataService/DataService.dart';
+import 'package:goal_play/Services/AuthServices/AuthServices.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,25 +17,60 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Dummy user data
-  final String userName = 'Warrior Khan';
-  final String userClass = 'Explorer';
-  final int userLevel = 12;
-  final int currentXP = 850;
-  final int requiredXP = 1200;
-  final int totalQuests = 145;
-  final int completedQuests = 128;
-  final int daysActive = 45;
+  // DataService for cached data
+  final DataService _dataService = DataService();
+  
+  bool isLoading = true;
+  
+  // Local variables for UI
+  String userName = 'Loading...';
+  String userEmail = 'Loading...';
+  String userClass = 'Explorer';
+  int userLevel = 1;
+  int currentXP = 0;
+  int requiredXP = 100;
+  int totalQuests = 0;
+  int completedQuests = 0;
+  int daysActive = 0;
+  int health = 100;
+  int strength = 50;
+  int intelligence = 50;
+  int gold = 0;
+  int unlockedAchievements = 0;
+  int totalAchievements = 15;
 
-  // Character stats
-  final int health = 85;
-  final int strength = 72;
-  final int intelligence = 68;
-  final int gold = 1250;
+  @override
+  void initState() {
+    super.initState();
+    _loadDataFromService();
+  }
 
-  // Unlocked achievements count
-  final int unlockedAchievements = 8;
-  final int totalAchievements = 15;
+  void _loadDataFromService() {
+    // Check if DataService is initialized
+    if (_dataService.isInitialized) {
+      final user = _dataService.currentUser!;
+      setState(() {
+        userName = user.name;
+        userEmail = user.name + '@email.com'; // Simple email fallback
+        userLevel = user.level;
+        currentXP = user.currentXP;
+        requiredXP = user.xpForNextLevel;
+        totalQuests = _dataService.allQuests.length;
+        completedQuests = _dataService.allQuests.where((q) => q.isCompleted).length;
+        health = user.health;
+        strength = user.strength;
+        intelligence = user.intelligence;
+        gold = user.goldCoins;
+        unlockedAchievements = (completedQuests ~/ 5);
+        isLoading = false;
+      });
+    } else {
+      // Wait a moment and try again
+      Future.delayed(Duration(milliseconds: 500), () {
+        _loadDataFromService();
+      });
+    }
+  }
 
   // Recent achievements (just for display)
   final List<Map<String, dynamic>> recentAchievements = [
@@ -55,8 +93,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double xpProgress = currentXP / requiredXP;
-    final int successRate = ((completedQuests / totalQuests) * 100).toInt();
+    // Use DataService for cached data
+    if (!_dataService.isInitialized) {
+      return Scaffold(
+        backgroundColor: AppColors.lightBackground,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryPurple),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Loading Profile...',
+                style: AppTextStyles.bodyDark,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final double xpProgress = userLevel > 0 ? currentXP / requiredXP : 0.0;
+    final int successRate = totalQuests > 0 ? ((completedQuests / totalQuests) * 100).toInt() : 0;
 
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
@@ -158,7 +218,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Name & Class
             Text(
-              userName,
+              _dataService.currentUser?.name ?? 'User',
               style: AppTextStyles.heading,
             ),
             SizedBox(height: 4),
@@ -172,11 +232,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(AppSizes.radiusSM),
               ),
               child: Text(
-                userClass,
+                'Level ${_dataService.currentUser?.level ?? 1}',
                 style: AppTextStyles.caption.copyWith(
                   color: AppColors.textWhite,
-                  fontWeight: FontWeight.w600,
                 ),
+              ),
+            ),
+            SizedBox(height: 8),
+            // Email
+            Text(
+              _dataService.currentUser?.name ?? 'User@email.com',
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.textDark,
+                fontSize: 14,
               ),
             ),
             SizedBox(height: AppSizes.padding),
@@ -370,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icon(Icons.emoji_events, color: AppColors.highlightGold, size: 28),
                     SizedBox(width: 8),
                     Text(
-                      '$unlockedAchievements / $totalAchievements',
+                      '${((completedQuests ~/ 5) / 15)}',
                       style: AppTextStyles.statValueLarge.copyWith(
                         color: AppColors.primaryPurple,
                       ),
@@ -381,7 +449,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppSizes.radiusSM),
                   child: LinearProgressIndicator(
-                    value: unlockedAchievements / totalAchievements,
+                    value: _dataService.allQuests.isNotEmpty ? 
+                        ((_dataService.allQuests.where((q) => q.isCompleted).length ~/ 5) / 15) : 0.0,
                     backgroundColor: AppColors.statsBackground,
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.highlightGold),
                     minHeight: 8,
@@ -389,7 +458,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '${((unlockedAchievements / totalAchievements) * 100).toInt()}% Complete',
+                  '${_dataService.allQuests.isNotEmpty ? 
+                      (((_dataService.allQuests.where((q) => q.isCompleted).length ~/ 5) / 15) * 100).toInt() : 0}% Complete',
                   style: AppTextStyles.caption.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -533,11 +603,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Expanded(
           child: Text(label, style: AppTextStyles.body),
         ),
+        SizedBox(width: AppSizes.padding),
         Text(
           value,
           style: AppTextStyles.statValue.copyWith(
             color: color,
             fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

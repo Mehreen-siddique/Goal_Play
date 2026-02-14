@@ -1,10 +1,13 @@
 // screens/auth/login_screen.dart
 
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:goal_play/Screens/Authentication/ForgotPassword/ForgotPassword.dart';
 import 'package:goal_play/Screens/Authentication/Signup/Signup.dart';
 import 'package:goal_play/Screens/Home/BottomBar/MainContainer.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
+import 'package:goal_play/Services/AuthServices/AuthServices.dart';
+import 'package:provider/provider.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -20,29 +23,43 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  Timer? _errorTimer;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _errorTimer?.cancel();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      final authService = context.read<AuthService>();
+      authService.clearError(); // Clear previous errors
+      
+      final success = await authService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
 
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      if (!success && mounted) {
+        _clearErrorAfterDelay(); // Auto-clear error after 5 seconds
+      }
 
-      setState(() => _isLoading = false);
-
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => MainContainerScreen()),
-        );
+      if (success && mounted) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainContainerScreen()));
       }
     }
+  }
+
+  void _clearErrorAfterDelay() {
+    _errorTimer?.cancel();
+    _errorTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted) {
+        context.read<AuthService>().clearError();
+      }
+    });
   }
 
 
@@ -73,9 +90,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
+
+    // Auto-navigate if authenticated
+    // if (authService.status == AuthStatus.authenticated)
+    // {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.push(context, MaterialPageRoute(builder: (context)=>MainContainerScreen()));
+    //   });
+    // }
     return
       Scaffold(
         backgroundColor: AppColors.lightBackground,
@@ -149,8 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!value.contains('@')) {
-                        return 'Please enter a valid email';
+                      // Basic email validation regex
+                      final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Please enter a valid email address';
                       }
                       return null;
                     },
@@ -223,6 +250,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 12),
 
+                  // Error Display
+                  if (authService.errorMessage != null)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorRed.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(AppSizes.radiusSM),
+                        border: Border.all(color: AppColors.errorRed.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline, color: AppColors.errorRed, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              authService.errorMessage!,
+                              style: AppTextStyles.caption.copyWith(color: AppColors.errorRed),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // Forgot Password
                   Align(
                     alignment: Alignment.centerLeft,
@@ -248,7 +298,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: AppSizes.buttonHeight,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _login,
+                      onPressed: authService.status == AuthStatus.loading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryPurple,
                         shape: RoundedRectangleBorder(
@@ -299,15 +349,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: _buildSocialButton(
                           icon: Icons.g_mobiledata,
                           label: 'Google',
-                          onTap: () {},
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildSocialButton(
-                          icon: Icons.facebook_rounded,
-                          label: 'Facebook',
-                          onTap: () {},
+                          onTap: () async {
+                            final authService = context.read<AuthService>();
+                            final success = await authService.signInWithGoogle();
+                            
+                            if (success && mounted) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => MainContainerScreen()),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ],
