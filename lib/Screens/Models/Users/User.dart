@@ -1,6 +1,7 @@
 class UserModel {
   final String id;
   final String name;
+  final String? email;
   final int level;
   final int currentXP;
   final int xpForNextLevel;
@@ -16,6 +17,7 @@ class UserModel {
   UserModel({
     required this.id,
     required this.name,
+    this.email,
     required this.level,
     required this.currentXP,
     required this.xpForNextLevel,
@@ -45,6 +47,7 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? name,
+    String? email,
     int? level,
     int? currentXP,
     int? xpForNextLevel,
@@ -60,6 +63,7 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      email: email ?? this.email,
       level: level ?? this.level,
       currentXP: currentXP ?? this.currentXP,
       xpForNextLevel: xpForNextLevel ?? this.xpForNextLevel,
