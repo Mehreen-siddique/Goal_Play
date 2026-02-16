@@ -3,6 +3,7 @@ import 'package:goal_play/Screens/Models/Quest/QuestClass.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
 import 'package:goal_play/Services/QuestServices/QuestServices.dart';
 import 'package:goal_play/Services/QuestServices/QuestServiceFirestore.dart';
+import 'package:goal_play/Services/DataService/DataService.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
@@ -674,6 +675,10 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
         
         // Update the quest object with the correct Firestore ID
         final updatedQuest = newQuest.copyWith(id: questId);
+
+        // Immediately update today's quests in DataService
+        final dataService = DataService();
+        await dataService.addQuestAndUpdateToday(updatedQuest);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
