@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:goal_play/Screens/Utils/Constants/Constants.dart';
+import 'package:goal_play/Services/DataService/DataService.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 
@@ -52,45 +53,80 @@ class ARCharacterScreen extends StatefulWidget {
 
 class _ARCharacterScreenState extends State<ARCharacterScreen> {
   // Removed image picker functionality
+  final DataService _dataService = DataService();
   late ARCharacterItem _selected;
   CharacterAnimMode _animMode = CharacterAnimMode.idle;
 
-  /// Dummy data
-  final List<ARCharacterItem> _characters = const [
-    ARCharacterItem(
-      id: 'warrior',
-      name: 'Warrior Khan',
-      characterClass: 'Warrior',
-      Icon: Icons.catching_pokemon,
-      idleModel: 'assets/images/2idle.glb',
-      actionModel: 'assets/models/1Dancing.glb',
-      actionLabel: 'fightingpose',
-      thumbnail: 'assets/images/warrior_thumb.jpg',
-      gradient: AppColors.gradientHard,
-    ),
-    ARCharacterItem(
-      id: 'scholar',
-      name: 'Scholar Ali',
-      characterClass: 'Scholar',
-      Icon: Icons.shield,
-      idleModel: 'assets/images/4idle.glb',
-      actionModel: 'assets/models/3HipHop.glb',
-      actionLabel: 'Dancing',
-      thumbnail: 'assets/images/scholar_thumb.jpg',
-      gradient: AppColors.gradientMedium,
-    ),
-    ARCharacterItem(
-      id: 'explorer',
-      name: 'Explorer Fatima',
-      characterClass: 'Explorer',
-      Icon: Icons.auto_fix_high,
-      idleModel: 'assets/images/3idle.glb',
-      actionModel: 'assets/models/3Excited.glb',
-      actionLabel: 'Excited',
-      thumbnail: 'assets/images/explorer_thumb.jpg',
-      gradient: AppColors.gradientEasy,
-    ),
-  ];
+  /// Character data loaded from user profile/preferences
+  List<ARCharacterItem> get _characters {
+    final user = _dataService.currentUser;
+    if (user == null) return _getDefaultCharacters();
+    
+    // Return characters based on user level or preferences
+    return _getCharactersForUserLevel(user.level);
+  }
+  
+  /// Default characters for new users
+  List<ARCharacterItem> _getDefaultCharacters() {
+    return const [
+      ARCharacterItem(
+        id: 'warrior',
+        name: 'Warrior Khan',
+        characterClass: 'Warrior',
+        Icon: Icons.catching_pokemon,
+        idleModel: 'assets/images/2idle.glb',
+        actionModel: 'assets/models/1Dancing.glb',
+        actionLabel: 'fightingpose',
+        thumbnail: 'assets/images/warrior_thumb.jpg',
+        gradient: AppColors.gradientHard,
+      ),
+      ARCharacterItem(
+        id: 'scholar',
+        name: 'Scholar Ali',
+        characterClass: 'Scholar',
+        Icon: Icons.shield,
+        idleModel: 'assets/images/4idle.glb',
+        actionModel: 'assets/models/3HipHop.glb',
+        actionLabel: 'Dancing',
+        thumbnail: 'assets/images/scholar_thumb.jpg',
+        gradient: AppColors.gradientMedium,
+      ),
+      ARCharacterItem(
+        id: 'explorer',
+        name: 'Explorer Fatima',
+        characterClass: 'Explorer',
+        Icon: Icons.auto_fix_high,
+        idleModel: 'assets/images/3idle.glb',
+        actionModel: 'assets/models/3Excited.glb',
+        actionLabel: 'Excited',
+        thumbnail: 'assets/images/explorer_thumb.jpg',
+        gradient: AppColors.gradientEasy,
+      ),
+    ];
+  }
+  
+  /// Get characters based on user level and achievements
+  List<ARCharacterItem> _getCharactersForUserLevel(int userLevel) {
+    final baseCharacters = _getDefaultCharacters();
+    
+    // Unlock characters based on user level
+    final unlockedCharacters = <ARCharacterItem>[];
+    
+    // Always have warrior available
+    unlockedCharacters.add(baseCharacters[0]);
+    
+    // Unlock scholar at level 3
+    if (userLevel >= 3) {
+      unlockedCharacters.add(baseCharacters[1]);
+    }
+    
+    // Unlock explorer at level 5
+    if (userLevel >= 5) {
+      unlockedCharacters.add(baseCharacters[2]);
+    }
+    
+    return unlockedCharacters;
+  }
 
   @override
   void initState() {
