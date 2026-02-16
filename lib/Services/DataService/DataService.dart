@@ -1,12 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:goal_play/Screens/Models/Quest/QuestClass.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:goal_play/Screens/Models/Users/User.dart';
-import 'package:goal_play/Services/AuthServices/AuthServices.dart';
+import 'package:goal_play/Screens/Models/Quest/QuestClass.dart';
+import 'package:goal_play/Services/QuestServices/QuestServices.dart';
 import 'package:goal_play/Services/QuestServices/QuestServiceFirestore.dart';
+import 'package:goal_play/Services/AuthServices/AuthServices.dart';
 import 'package:flutter/foundation.dart';
 
-class DataService {
+class DataService with ChangeNotifier {
   static final DataService _instance = DataService._internal();
   factory DataService() => _instance;
   DataService._internal();
@@ -146,6 +148,35 @@ class DataService {
     print('DataService: Refreshing data...');
     _isInitialized = false;
     await initializeData();
+    // Notify all listeners about the update
+    notifyListeners();
+  }
+  
+  // Add real-time quest listener
+  void startRealtimeQuestUpdates() {
+    print('DataService: Starting real-time quest updates...');
+    _firestore.collection('quests').snapshots().listen((snapshot) {
+      print('DataService: Quest data updated, refreshing...');
+      _isInitialized = false;
+      initializeData();
+      notifyListeners();
+    });
+  }
+  
+  // Add new quest and update today's quests immediately
+  Future<void> addQuestAndUpdateToday(Quest newQuest) async {
+    try {
+      print('DataService: Adding new quest and updating today\'s quests...');
+      
+      // Add quest to Firestore
+      final questService = QuestServiceFirestore();
+      await questService.createQuest(newQuest);
+      
+      // Immediately refresh data to update today's quests
+      await refreshData();
+    } catch (e) {
+      print('DataService: Error adding quest: $e');
+    }
   }
   
   // Update user stats in Firebase
