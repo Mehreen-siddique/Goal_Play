@@ -44,37 +44,37 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAvwkWHTZ5qHJWxq94NaeYNRaiu-OLo8e0',
-    appId: '1:480773029928:web:d585982c37876a8c1e351d',
-    messagingSenderId: '480773029928',
-    projectId: 'goal-play',
-    authDomain: 'goal-play.firebaseapp.com',
-    storageBucket: 'goal-play.firebasestorage.app',
+    apiKey: 'YOUR_WEB_API_KEY_HERE', // Replace with environment variable
+    appId: 'YOUR_WEB_APP_ID_HERE', // Replace with environment variable
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE', // Replace with environment variable
+    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with environment variable
+    authDomain: 'YOUR_AUTH_DOMAIN_HERE', // Replace with environment variable
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE', // Replace with environment variable
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBboBdcXt9hthYVgncRtN8VG9S_ZXimVeg',
-    appId: '1:480773029928:android:9d726b88dc7fb80a1e351d',
-    messagingSenderId: '480773029928',
-    projectId: 'goal-play',
-    storageBucket: 'goal-play.firebasestorage.app',
+    apiKey: 'YOUR_ANDROID_API_KEY_HERE', // Replace with environment variable
+    appId: 'YOUR_ANDROID_APP_ID_HERE', // Replace with environment variable
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE', // Replace with environment variable
+    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with environment variable
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE', // Replace with environment variable
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDlXXYMMZ6H_9awtIpcTEc9JJ098AqEG5o',
-    appId: '1:480773029928:ios:cd5a90f56bf339c01e351d',
-    messagingSenderId: '480773029928',
-    projectId: 'goal-play',
-    storageBucket: 'goal-play.firebasestorage.app',
-    iosBundleId: 'com.example.goalPlay',
+    apiKey: 'YOUR_IOS_API_KEY_HERE', // Replace with environment variable
+    appId: 'YOUR_IOS_APP_ID_HERE', // Replace with environment variable
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE', // Replace with environment variable
+    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with environment variable
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE', // Replace with environment variable
+    iosBundleId: 'YOUR_IOS_BUNDLE_ID_HERE', // Replace with environment variable
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAvwkWHTZ5qHJWxq94NaeYNRaiu-OLo8e0',
-    appId: '1:480773029928:web:bb769862b5c704e31e351d',
-    messagingSenderId: '480773029928',
-    projectId: 'goal-play',
-    authDomain: 'goal-play.firebaseapp.com',
-    storageBucket: 'goal-play.firebasestorage.app',
+    apiKey: 'YOUR_WINDOWS_API_KEY_HERE', // Replace with environment variable
+    appId: 'YOUR_WINDOWS_APP_ID_HERE', // Replace with environment variable
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE', // Replace with environment variable
+    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with environment variable
+    authDomain: 'YOUR_AUTH_DOMAIN_HERE', // Replace with environment variable
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE', // Replace with environment variable
   );
 }
