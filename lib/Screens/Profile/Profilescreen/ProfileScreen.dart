@@ -22,10 +22,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   
   bool isLoading = true;
   
-  // Local variables for UI
-  String userName = 'Loading...';
-  String userEmail = 'Loading...';
-  String userClass = 'Explorer';
+  // Local variables for UI - will be populated from DataService
+  String userName = '';
+  String userEmail = '';
+  String userClass = '';
   int userLevel = 1;
   int currentXP = 0;
   int requiredXP = 100;
@@ -33,8 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int completedQuests = 0;
   int daysActive = 0;
   int health = 100;
-  int strength = 50;
-  int intelligence = 50;
   int gold = 0;
   int unlockedAchievements = 0;
   int totalAchievements = 15;
@@ -51,17 +49,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final user = _dataService.currentUser!;
       setState(() {
         userName = user.name;
-        userEmail = user.name + '@email.com'; // Simple email fallback
+        userEmail = user.email ?? 'user@example.com'; // Use actual email or fallback
         userLevel = user.level;
         currentXP = user.currentXP;
         requiredXP = user.xpForNextLevel;
         totalQuests = _dataService.allQuests.length;
         completedQuests = _dataService.allQuests.where((q) => q.isCompleted).length;
         health = user.health;
-        strength = user.strength;
-        intelligence = user.intelligence;
         gold = user.goldCoins;
         unlockedAchievements = (completedQuests ~/ 5);
+        userClass = _getUserClass(userLevel); // Dynamic class based on level
         isLoading = false;
       });
     } else {
@@ -70,6 +67,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _loadDataFromService();
       });
     }
+  }
+
+  // Get user class based on level
+  String _getUserClass(int level) {
+    if (level >= 10) return 'Legend';
+    if (level >= 7) return 'Master';
+    if (level >= 5) return 'Expert';
+    if (level >= 3) return 'Adventurer';
+    return 'Explorer';
   }
 
   // Recent achievements (just for display)
@@ -106,7 +112,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               SizedBox(height: 16),
               Text(
-                'Loading Profile...',
+                isLoading 
+                    ? 'Loading Profile...'
+                    : (userName.isEmpty ? 'User Profile' : '$userName\'s Profile'),
                 style: AppTextStyles.bodyDark,
               ),
             ],
@@ -312,28 +320,242 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: Column(
               children: [
-                _buildStatBar('Health', health, Icons.favorite, AppColors.errorRed),
-                SizedBox(height: AppSizes.paddingSM),
-                _buildStatBar('Strength', strength, Icons.fitness_center, AppColors.accentGreen),
-                SizedBox(height: AppSizes.paddingSM),
-                _buildStatBar('Intelligence', intelligence, Icons.lightbulb, AppColors.accentBlue),
-                SizedBox(height: AppSizes.paddingSM),
-                Divider(),
-                SizedBox(height: AppSizes.paddingSM),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                // Health Stat
+                _buildEnhancedProfileStat(
+                  'Health',
+                  health,
+                  Icons.favorite,
+                  AppColors.accentGreen,
+                  _dataService.currentUser?.maxHealth ?? 100,
+                ),
+                SizedBox(height: AppSizes.padding),
+                
+                // Gold Section
+                _buildEnhancedGoldSection(),
+                SizedBox(height: AppSizes.padding),
+                
+                // Divider
+                Divider(
+                  color: AppColors.textGray.withOpacity(0.3),
+                  thickness: 1,
+                ),
+                SizedBox(height: AppSizes.padding),
+                
+                // Quest Stats
+                _buildQuestStats(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnhancedProfileStat(
+    String label,
+    int value,
+    IconData icon,
+    Color color,
+    int maxValue,
+  ) {
+    final double progress = maxValue > 0 ? value / maxValue : 0.0;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.05),
+            color.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.monetization_on, color: AppColors.highlightGold, size: 28),
-                    SizedBox(width: 8),
                     Text(
-                      '$gold Gold',
-                      style: AppTextStyles.statValueLarge.copyWith(
-                        color: AppColors.highlightGold,
+                      label,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    Text(
+                      '$value/$maxValue',
+                      style: AppTextStyles.caption.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: color.withOpacity(0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnhancedGoldSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.highlightGold.withOpacity(0.05),
+            AppColors.leaderboardGold.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.highlightGold.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.highlightGold,
+                  AppColors.leaderboardGold,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.monetization_on,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Gold Coins',
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                Text(
+                  '$gold',
+                  style: AppTextStyles.heading.copyWith(
+                    color: AppColors.highlightGold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestStats() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryPurple.withOpacity(0.05),
+            AppColors.accentMagenta.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.primaryPurple.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryPurple.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.emoji_events,
+                  color: AppColors.primaryPurple,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Quest Progress',
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    Text(
+                      '$completedQuests/$totalQuests Completed',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primaryPurple,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: totalQuests > 0 ? completedQuests / totalQuests : 0.0,
+              backgroundColor: AppColors.primaryPurple.withOpacity(0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryPurple),
+              minHeight: 8,
             ),
           ),
         ],
