@@ -41,6 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
         quests = _dataService.todayQuests; // Use today's quests only
         isLoading = false;
       });
+      
+      // Start real-time quest updates
+      _dataService.startRealtimeQuestUpdates();
     } else {
       // Wait a moment and try again
       Future.delayed(Duration(milliseconds: 500), () {
@@ -551,12 +554,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.statsBackground,
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryPurple.withOpacity(0.1),
+            AppColors.accentMagenta.withOpacity(0.1),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.primaryPurple.withOpacity(0.2),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.statsBackground.withOpacity(0.1),
-            blurRadius: 4,
+            color: AppColors.primaryPurple.withOpacity(0.1),
+            blurRadius: 10,
             offset: const Offset(0, 5),
           ),
         ],
@@ -566,21 +578,37 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.shield,
-                color: AppColors.highlightGold,
-                size: 24,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.highlightGold,
+                      AppColors.leaderboardGold,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.shield,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Text(
                 'Character Stats',
-                style: AppTextStyles.subheading,
+                style: AppTextStyles.subheading.copyWith(
+                  color: AppColors.textDark,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          StatBar(
+          // Health Stat
+          _buildEnhancedStatItem(
             label: 'Health',
             current: user.health,
             max: user.maxHealth,
@@ -588,23 +616,147 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icons.favorite,
           ),
 
-          SizedBox(height: 10,),
-          StatBar(
-            label: 'Strength',
-            current: user.strength,
-            max: user.maxStrength,
-            color: Color(0xFFF87171),
-            icon: Icons.fitness_center,
+          const SizedBox(height: 16),
+
+          // Gold Stat
+          _buildEnhancedGoldItem(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnhancedStatItem({
+    required String label,
+    required int current,
+    required int max,
+    required Color color,
+    required IconData icon,
+  }) {
+    final double progress = max > 0 ? current / max : 0.0;
+    
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 20,
+            ),
           ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      label,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    Text(
+                      '$current/$max',
+                      style: AppTextStyles.caption.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: color.withOpacity(0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    minHeight: 6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          SizedBox(height: 10,),
-
-          StatBar(
-            label: 'Intelligence',
-            current: user.intelligence,
-            max: user.maxIntelligence,
-            color: AppColors.accentBlue,
-            icon: Icons.school,
+  Widget _buildEnhancedGoldItem() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.highlightGold.withOpacity(0.1),
+            AppColors.leaderboardGold.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.highlightGold.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.highlightGold,
+                  AppColors.leaderboardGold,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.monetization_on,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Gold Coins',
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${user.goldCoins}',
+                  style: AppTextStyles.subheading.copyWith(
+                    color: AppColors.highlightGold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
