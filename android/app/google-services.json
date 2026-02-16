@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "480773029928",
-    "firebase_url": "https://goal-play-default-rtdb.firebaseio.com",
-    "project_id": "goal-play",
-    "storage_bucket": "goal-play.firebasestorage.app"
+    "project_number": "YOUR_PROJECT_NUMBER_HERE",
+    "firebase_url": "YOUR_FIREBASE_URL_HERE",
+    "project_id": "YOUR_PROJECT_ID_HERE",
+    "storage_bucket": "YOUR_STORAGE_BUCKET_HERE"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:480773029928:android:9d726b88dc7fb80a1e351d",
+        "mobilesdk_app_id": "YOUR_ANDROID_APP_ID_HERE",
         "android_client_info": {
-          "package_name": "com.example.goal_play"
+          "package_name": "YOUR_PACKAGE_NAME_HERE"
         }
       },
       "oauth_client": [
         {
-          "client_id": "480773029928-h20g7b83n2pp1qu8o36l59imqgjh0t79.apps.googleusercontent.com",
+          "client_id": "YOUR_OAUTH_CLIENT_ID_HERE",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.goal_play",
-            "certificate_hash": "360c660a2f920d588da4c243bf794c7eeb39e8fd"
+            "package_name": "YOUR_PACKAGE_NAME_HERE",
+            "certificate_hash": "YOUR_CERTIFICATE_HASH_HERE"
           }
         },
         {
-          "client_id": "480773029928-0lirhrrhqleo9si1f36lf0n8hjibgug2.apps.googleusercontent.com",
+          "client_id": "YOUR_OAUTH_CLIENT_ID_HERE",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBboBdcXt9hthYVgncRtN8VG9S_ZXimVeg"
+          "current_key": "YOUR_ANDROID_API_KEY_HERE"
         }
       ],
       "services": {
